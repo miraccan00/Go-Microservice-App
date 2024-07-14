@@ -1,0 +1,99 @@
+version: '3.8'
+
+services:
+  apigateway-service:
+    container_name: apigateway-service
+    restart: always
+    build:
+      context: ./apigateway-service
+    ports:
+      - "3000:3000"
+  auth-service:
+    container_name: auth-service
+    restart: always
+    build:
+      context: ./auth-service
+    ports:
+      - "3001:3001"
+    environment:
+      - DB_HOST=db
+
+
+  activity-service:
+    container_name: activity-service
+    restart: always
+    build:
+      context: ./activity-service
+    ports:
+      - "3002:3002"
+    environment:
+      - DB_HOST=db
+
+
+  step-service:
+    container_name: step-service
+    restart: always
+    build:
+      context: ./step-service
+    ports:
+      - "3003:3003"
+    environment:
+      - DB_HOST=db
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+
+  # auth-db:
+  #   container_name: auth-db
+  #   image: postgres
+  #   environment:
+  #     POSTGRES_DB: authdb
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: postgres
+  #   networks:
+  #     - microservices-network
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  # activity-db:
+  #   container_name: activity-db
+  #   image: postgres
+  #   environment:
+  #     POSTGRES_DB: activitydb
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: postgres
+  #   networks:
+  #     - microservices-network
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  # step-db:
+  #   container_name: step-db
+  #   image: postgres
+  #   environment:
+  #     POSTGRES_DB: stepdb
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: postgres
+  #   networks:
+  #     - microservices-network
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  db:
+    image: postgres:13
+    container_name: db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: authdb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:
